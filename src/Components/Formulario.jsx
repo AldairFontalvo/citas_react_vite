@@ -1,7 +1,7 @@
 import Error from './Error';
 import { useState,useEffect } from "react";
 
-const Formulario = ({pacientes,setPacientes}) => {
+const Formulario = ({pacientes,setPacientes,paciente,setPaciente}) => {
 
     const [formmascota, setformmascota]=useState({
         nombre:'',
@@ -11,6 +11,14 @@ const Formulario = ({pacientes,setPacientes}) => {
         sintomas:''
     });
     const[error, setError]=useState(false);
+
+    useEffect(()=>{
+        if(Object.keys(paciente).length>0){
+            setformmascota(paciente)
+        }
+       
+    },[paciente])
+    
 
     const generarId =()=>{
         const fecha=Date.now().toString(36);
@@ -38,9 +46,21 @@ const Formulario = ({pacientes,setPacientes}) => {
                 email:formmascota.email,
                 alta:formmascota.alta,
                 sintomas:formmascota.sintomas,
-                id:generarId()
             }
-            setPacientes([...pacientes,objetopaciente]);
+
+            if(paciente.id){
+                //Editando registro
+                objetopaciente.id=paciente.id;
+
+                const pacientesActualizados=pacientes.map(pacienteState=>paciente.id==pacienteState.id?objetopaciente:pacienteState)
+                setPacientes(pacientesActualizados);
+                setPaciente({})
+            }else{
+                //Nuevo registro
+                objetopaciente.id=generarId()
+                setPacientes([...pacientes,objetopaciente]);
+            }
+            
             const resetform={
                 nombre:'',
                 propietario:'',
@@ -125,7 +145,7 @@ const Formulario = ({pacientes,setPacientes}) => {
                 <input
                     type="submit"
                     className="bg-indigo-600 w-full p-3 text-white uppercase font-boldsss hover:bg-indigo-700 cursor-pointer transition-colors"
-                    value="Agregar paciente"
+                    value={paciente.id?'Actualizar paciente':'Agregar paciente'}
                 />
             </form>
         </div>
